@@ -1,0 +1,24 @@
+// Here you can add other styles
+.breadcrumb-item {
+  text-transform: capitalize;
+  color: white; // hide for now
+}
+.badge {
+  text-transform: uppercase;
+  padding: 6px 10px;
+}
+
+.single-payroll-item {
+  border: 1px solid gray;
+  height: 50px;
+  margin-bottom: 10px;
+
+  span {
+    font-size: 20px;
+  }
+  
+  .center-pay-item{
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+  }
+}
