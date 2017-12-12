@@ -78,22 +78,18 @@
 /* global google:true $:true */
 
 import firebase from 'firebase';
-import uniqid from 'uniqid';
 import { isEmpty } from 'lodash';
 import VueTimepicker from 'vue2-timepicker';
 import Datepicker from 'vuejs-datepicker';
 // import VueGoogleAutocomplete from 'vue-google-autocomplete';
+
 import AddContributor from '~/components/admin/events/AddContributor.vue';
 
-const db = firebase.app('AdminApp').database();
 const storage = firebase.app('AdminApp').storage();
-
-const eventsRef = db.ref('events');
 const eventImageRef = storage.ref('events');
 export default {
   name: 'CreateEvent',
   // lifecycle methods
-
   components: {
     Datepicker,
     VueTimepicker,
@@ -116,10 +112,7 @@ export default {
       this.createEventPhase2();
     },
     createEventPhase2() {
-      let slug = this.generateSlug(this.event.title);
-      slug = `${slug}-`;
       this.event.when.date = this.date.getTime();
-      this.event.url_slug = uniqid(slug);
 
       let imageName = this.tempBackground.name;
       let imageRef = eventImageRef.child(imageName);
@@ -128,17 +121,6 @@ export default {
         .then(snapshot => {
           this.event.background_image_url = snapshot.downloadURL;
           console.log(this.event);
-          eventsRef.push(this.event, error => {
-            if (error) {
-              console.log(error);
-              alert(`Issue creating event: ${error.message}`);
-            } else {
-              alert('Event successfully created');
-              this.$data.event = this.initialState().event;
-              this.$router.replace('/events');
-            }
-            this.saving = false;
-          });
         })
         .catch(error => {
           alert(`Issue uploading background image: ${error.message}`);
@@ -202,14 +184,6 @@ export default {
     },
     openFileDialog() {
       $('#fopen').trigger('click');
-    },
-    generateSlug(text) {
-      return text
-        .toString()
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-')
-        .replace(/&/g, '-and-');
     },
     initialState() {
       return {

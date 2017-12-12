@@ -1,39 +1,38 @@
 <template>
 
   <!-- page content -->
-  <div class="right_col" role="main">
-    <!-- top tiles -->
-    <div class="row tile_count">
-      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Total Events</span>
-        <div class="count">2500</div>
-        <span class="count_bottom"><i class="green">4% </i> From last Week</span>
-      </div>
-      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-clock-o"></i> Most Attendance</span>
-        <div class="count">123.50</div>
-        <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>3% </i> From last Week</span>
-      </div>
-      <div class="col-md-2 col-sm-5 col-xs-7 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Total Events This Month</span>
-        <div class="count green">2,500</div>
-        <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>34% </i> From last Week</span>
-      </div>
-      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Total Females</span>
-        <div class="count">4,567</div>
-        <span class="count_bottom"><i class="red"><i class="fa fa-sort-desc"></i>12% </i> From last Week</span>
-      </div>
-      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-        <span class="count_top"><i class="fa fa-user"></i> Total Collections</span>
-        <div class="count">2,315</div>
-        <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>34% </i> From last Week</span>
-      </div>
-    </div>
-    <!-- /top tiles -->
+  <div class="animated">
+    <b-row>
+      <b-col cols="6" lg="3">
+        <b-card :no-body="true">
+          <b-card-body class="p-3 clearfix">
+            <i class="fa fa-cogs bg-primary p-3 font-2xl mr-3 float-left"></i>
+            <div class="h5 text-primary mb-0 mt-2">{{statistics.totalEventCount}}</div>
+            <div class="text-muted text-uppercase font-weight-bold font-xs">Total Events</div>
+          </b-card-body>
+        </b-card>
+      </b-col>
+      <b-col cols="6" lg="3">
+        <b-card :no-body="true">
+          <b-card-body class="p-3 clearfix">
+            <i class="fa fa-laptop bg-info p-3 font-2xl mr-3 float-left"></i>
+            <div class="h5 text-info mb-0 mt-2">{{statistics.currentMonthEventsCount}}</div>
+            <div class="text-muted text-uppercase font-weight-bold font-xs">Total Events This Month</div>
+          </b-card-body>
+        </b-card>
+      </b-col>
+      <b-col cols="6" lg="3">
+        <b-card :no-body="true">
+          <b-card-body class="p-3 clearfix">
+            <i class="fa fa-moon-o bg-warning p-3 font-2xl mr-3 float-left"></i>
+            <div class="h5 text-warning mb-0 mt-2">{{statistics.highestAttendanceCount}}</div>
+            <div class="text-muted text-uppercase font-weight-bold font-xs">Highest Attendance</div>
+          </b-card-body>
+        </b-card>
+      </b-col>
+    </b-row>
   </div>
   <!-- /page content -->
-
 </template>
 
 
@@ -42,17 +41,17 @@ export default {
   name: 'Dashboard',
   data() {
     return {
-      notes: []
+      statistics: {}
     };
   },
   asyncData({ app }) {
     return app.$axios
-      .$get(`/sponsors`)
+      .$get(`/stats`)
       .then(res => {
-        return { sponsors: res.data };
+        return { statistics: res.data };
       })
       .catch(e => {
-        console.log('error', e.config);
+        console.log('error', e.response);
         return {};
       });
   }

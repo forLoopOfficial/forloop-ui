@@ -83,11 +83,10 @@ module.exports = {
   },
   plugins: [
     '~plugins/filters.js',
-    '~plugins/bootstrap-vue.js',
     '~plugins/bootstrap-setup.js',
     { src: '~plugins/firebase.js', ssr: false }
   ],
-  modules: ['@nuxtjs/axios', '@nuxtjs/toast'],
+  modules: ['@nuxtjs/axios', '@nuxtjs/toast', 'bootstrap-vue/nuxt'],
   axios: {
     baseURL: process.env.API_URL,
     credentials: false

@@ -1,15 +1,9 @@
 <template>
-  <div v-if="isExternalLink">
-    <a :href="url" :class="classList">
+  <div>
+    <nuxt-link :to="prependLink" :class="classList">
       <i :class="icon"></i> {{name}}
       <b-badge v-if="badge && badge.text" :variant="badge.variant">{{badge.text}}</b-badge>
-    </a>
-  </div>
-  <div v-else>
-    <router-link :to="url" :class="classList">
-      <i :class="icon"></i> {{name}}
-      <b-badge v-if="badge && badge.text" :variant="badge.variant">{{badge.text}}</b-badge>
-    </router-link>
+    </nuxt-link>
   </div>
 </template>
 
@@ -52,12 +46,8 @@ export default {
     itemClasses() {
       return this.classes ? this.classes.split(' ') : [];
     },
-    isExternalLink() {
-      if (this.url.substring(0, 4) === 'http') {
-        return true;
-      } else {
-        return false;
-      }
+    prependLink() {
+      return `/admin${this.url}`;
     }
   }
 };

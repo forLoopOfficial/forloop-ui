@@ -6,6 +6,10 @@
  * @license MIT
  */
 
+/* Import Font Awesome Icons Set */
+$fa-font-path: 'node_modules/font-awesome/fonts/';
+@import 'node_modules/font-awesome/css/font-awesome.min.css';
+
 // Override Boostrap variables
 @import "bootstrap-variables";
 

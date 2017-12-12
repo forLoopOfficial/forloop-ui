@@ -1,5 +1,4 @@
 <template>
-  <div class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden sidebar-hidden">
     <div class="app">
       <AppHeader/>
       <div class="app-body">
@@ -10,11 +9,9 @@
             <nuxt/>
           </div>
         </main>
-        <AppAside/>
       </div>
       <AppFooter/>
     </div>
-  </div>
 </template>
 
 <script>
@@ -36,6 +33,16 @@ export default {
     AppFooter,
     Breadcrumb
   },
+  head() {
+    return {
+      metaInfo: {
+        bodyAttrs: {
+          class:
+            'app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden sidebar-hidden'
+        }
+      }
+    };
+  },
   data() {
     return {
       nav: nav.items
@@ -53,5 +60,5 @@ export default {
 </script>
 
 <style lang="scss">
-// @import '~assets/admin/scss/style.scss';
+@import '~assets/admin/scss/style.scss';
 </style>
