@@ -8,7 +8,7 @@
       </b-col>
     </b-row>
     <b-row>
-      <sponsor v-for="(sponsor, index) in sponsors" :sponsor="sponsor" :key="sponsor._id"></sponsor>
+      <sponsor v-for="sponsor in sponsors" :sponsor="sponsor" :key="sponsor._id"></sponsor>
     </b-row>
     <add-sponsor :show="show" :closed="closeAddModal"></add-sponsor>
   </div>
@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import Sponsor from '~/components/admin/sponsors/Sponsor.vue';
 import AddSponsor from '~/components/admin/sponsors/AddSponsor.vue';
+import Sponsor from '~/components/admin/sponsors/Sponsor.vue';
 
 export default {
   name: 'Sponsors',
