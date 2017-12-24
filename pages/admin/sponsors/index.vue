@@ -1,133 +1,74 @@
 <template>
 
   <!-- page content -->
-  <div class="right_col" role="main">
-    <h1>Sponsors</h1>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="x_panel">
-          <div class="x_title">
-            <h2>Add Sponsor</h2>
-            <ul class="nav navbar-right panel_toolbox">
-              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-              </li>
-            </ul>
-            <div class="clearfix"></div>
-          </div>
-          <div class="x_content">
-            <form class="" @submit.prevent="addSponsor">
-              <div class="row">
-                  <div class="col-md-3">
-                    <input v-model="newSponsor.name" type="text" class="form-control" placeholder="Sponsor name">
-                  </div>
-                  <div class="col-md-6">
-                    <input @change="onFileChange" type="file" class="form-control" placeholder="Upload Sponsor logo">
-                  </div>
-                  <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary">Add Sponsor</button>
-                  </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="x_panel">
-          <div class="x_title">
-            <h2>Sponsors Gallery</h2>
-            <!-- <button type="button" name="button" @click="openAddSponsorModal">Add Sponsor</button> -->
-            <ul class="nav navbar-right panel_toolbox">
-              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-              </li>
-            </ul>
-            <div class="clearfix"></div>
-          </div>
-
-          <div class="x_content">
-            <div class="row">
-              <Sponsor v-for="sponsor in sponsors" :sponsor="sponsor" :key="sponsor['.key']"></Sponsor>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="animated fadeIn">
+    <b-row>
+      <b-col sm="12">
+        <b-button variant="primary" type="button" @click="openAddModal">Add Sponsor(s)</b-button>
+      </b-col>
+    </b-row>
+    <b-row>
+      <sponsor v-for="(sponsor, index) in sponsors" :sponsor="sponsor" :key="sponsor._id"></sponsor>
+    </b-row>
+    <add-sponsor :show="show" :closed="closeAddModal"></add-sponsor>
   </div>
   <!-- /page content -->
 </template>
 
 <script>
-/* global Vue:true */
-import firebase from 'firebase';
-
-import Sponsor from '~/components/admin/sponsors/sponsor.vue';
-import CreateSponsor from '~/components/admin/sponsors/CreateSponsor.vue';
-
-const db = firebase.database();
-const storage = firebase.storage();
-const sponsorsRef = db.ref('sponsors');
-const sponsorsImageRef = storage.ref('sponsors');
-
-const CreateSponsorComponent = Vue.extend(CreateSponsor);
-const openSponsorModal = () => {
-  const modal = new CreateSponsorComponent({
-    el: document.createElement('div')
-  });
-  return modal;
-};
+import Sponsor from '~/components/admin/sponsors/Sponsor.vue';
+import AddSponsor from '~/components/admin/sponsors/AddSponsor.vue';
 
 export default {
   name: 'Sponsors',
+  components: {
+    AddSponsor,
+    Sponsor
+  },
   // lifecycle methods
 
   data() {
     return {
-      loading: false,
-      imageFile: null,
-      newSponsor: {
-        name: '',
-        link: '',
-        image_url: null
+      show: false,
+      sponsors: [],
+      meta: {
+        page: 1,
+        perPage: 10,
+        previousPage: false,
+        nextPage: false,
+        pageCount: 1,
+        total: 1
       }
     };
   },
-  components: {
-    Sponsor,
-    CreateSponsor
-  },
-  // Vuefire binding
-  firebase: {
-    sponsors: sponsorsRef
+  asyncData({ app }) {
+    return app.$axios
+      .$get(`/sponsors`)
+      .then(res => {
+        return { sponsors: res.data };
+      })
+      .catch(e => {
+        console.log('error', e.response);
+        return {};
+      });
   },
   methods: {
-    openAddSponsorModal() {
-      const modal = openSponsorModal();
-      console.log(modal);
+    openAddModal() {
+      this.show = true;
     },
-    addSponsor() {
-      let imageName = `${new Date().getTime()}_${this.imageFile.name}`;
-      let imageRef = sponsorsImageRef.child(imageName);
-      imageRef
-        .put(this.imageFile)
-        .then(snapshot => {
-          this.newSponsor.image_url = snapshot.downloadURL;
-          console.log(this.newSponsor);
-          sponsorsRef.push(this.newSponsor);
-          this.imageFile = null;
-          this.newSponsor.name = '';
-          alert('Sponsor successfully added');
+    closeAddModal() {
+      this.show = false;
+      this.fetchData();
+    },
+    fetchData() {
+      return this.$axios
+        .$get(`/countries`)
+        .then(res => {
+          return (this.countries = res.data);
         })
-        .catch(error => {
-          console.log(error);
-          alert('Issue Uploading Images');
+        .catch(e => {
+          console.log('error', e.response);
         });
-    },
-    onFileChange(e) {
-      var files = e.target.files || e.dataTransfer.files;
-      if (!files.length) return;
-      console.log(files);
-      this.imageFile = files[0];
     }
   }
 };

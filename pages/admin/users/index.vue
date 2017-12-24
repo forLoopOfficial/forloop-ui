@@ -1,75 +1,118 @@
 <template>
 
-  <!-- Component content -->
-  <div class="">
-    <div class="page-title">
-      <div class="title_left">
-        <h3>Admin Contacts</h3>
-        <button @click="showModal" type="button" class="btn btn-primary">Add User</button>
-      </div>
-
-      <div class="title_right">
-        <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Search for...">
-            <span class="input-group-btn">
-              <button class="btn btn-default" type="button">Go!</button>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="clearfix"></div>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="x_panel">
-          <div class="x_content">
-            <div class="row">
-              <user-contact-box v-for="(user, index) in users" :user="user" :key="index"></user-contact-box>
-              <h2 v-if="!users">No Users</h2>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <create-user :show="show"></create-user>
+  <!-- Page content -->
+  <div class="animated fadeIn">
+    <b-row>
+      <b-col sm="12">
+        <b-button variant="primary" type="button" @click="openAddModal">Add Admin</b-button>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col sm="12">
+        <b-card :header="caption">
+          <b-table :hover="true" :striped="true" :bordered="true" :fixed="true" class="table-responsive-sm" :items="users" :fields="fields" :current-page="meta.page" :per-page="meta.perPage">
+            <template slot="full_name" scope="data">
+              {{data.item.first_name}}, {{data.item.last_name}}
+            </template>
+            <template slot="active" scope="data">
+              <b-badge :variant="getBadge(data.item.active)">{{getStatus(data.item.active)}}</b-badge>
+            </template>
+            <template slot="country" scope="data">
+              <p>{{data.item.country && data.item.country.name}}</p>
+            </template>
+          </b-table>
+          <nav>
+            <b-pagination :total-rows="getRowCount(users)" :per-page="meta.perPage" v-model="meta.page" prev-text="Prev" next-text="Next" hide-goto-end-buttons/>
+          </nav>
+        </b-card>
+      </b-col>
+    </b-row>
+    <add-user :show="show" :closed="closeAddModal" :countries="countries"></add-user>
   </div>
-  <!-- /Component content -->
+  <!-- /Page content -->
 
 </template>
 
 
 <script>
-import firebase from 'firebase';
-import UserContactBox from '~/components/admin/users/UserContactBox.vue';
-import CreateUser from '~/components/admin/users/CreateUser.vue';
+import { assign } from 'lodash';
 
-const usersRef = firebase.database().ref('users');
+import AddUser from '~/components/admin/users/AddUser.vue';
 export default {
-  name: 'ViewUsers',
+  name: 'Users',
   // lifecycle methods
-  created() {
-    this.$root.$on('hidden::modal', () => {
-      this.show = false;
-    });
-  },
 
   components: {
-    UserContactBox,
-    CreateUser
-  },
-  // Vuefire binding
-  firebase: {
-    users: usersRef
+    AddUser
   },
   data() {
     return {
-      show: false
+      show: false,
+      caption: "<i class='fa fa-align-justify'></i> Admins",
+      fields: ['full_name', 'username', 'role', 'email', 'active', 'country'],
+      users: [],
+      countries: [],
+      meta: {
+        page: 1,
+        perPage: 10,
+        previousPage: false,
+        nextPage: false,
+        pageCount: 1,
+        total: 1
+      }
     };
   },
+  asyncData({ app }) {
+    const adminsReq = app.$axios
+      .$get(`/admins`)
+      .then(res => {
+        return { users: res.data };
+      })
+      .catch(e => {
+        console.log('error', e.response);
+        return {};
+      });
+    const countriesReq = app.$axios
+      .$get(`/countries`)
+      .then(res => {
+        return { countries: res.data };
+      })
+      .catch(e => {
+        console.log('error', e.response);
+        return {};
+      });
+    return Promise.all([adminsReq, countriesReq]).then(
+      ([admins, countries]) => {
+        return assign({}, admins, countries);
+      }
+    );
+  },
   methods: {
-    showModal() {
+    getBadge(active) {
+      return active ? 'success' : 'warning';
+    },
+    getStatus(active) {
+      return active ? 'active' : 'inactive';
+    },
+    getRowCount(items) {
+      return items.length;
+    },
+    openAddModal() {
       this.show = true;
+    },
+    closeAddModal() {
+      this.show = false;
+      this.fetchData();
+    },
+    fetchData() {
+      return this.$axios
+        .$get(`/admins`)
+        .then(res => {
+          return (this.users = res.data);
+        })
+        .catch(e => {
+          console.log('error', e.response);
+        });
     }
   }
 };

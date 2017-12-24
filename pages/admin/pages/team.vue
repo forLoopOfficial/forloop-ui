@@ -7,36 +7,6 @@
       <div class="col-md-12">
         <div class="x_panel">
           <div class="x_title">
-            <h2>Change Team Page Description</h2>
-            <ul class="nav navbar-right panel_toolbox">
-              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-              </li>
-            </ul>
-            <div class="clearfix"></div>
-          </div>
-          <div class="x_content">
-            <form class="" @submit.prevent="changeTeamDescription">
-              <div class="row">
-                  <div class="col-md-6 col-md-offset-3">
-                    <textarea v-model="team_page.description" name="description" placeholder="Team Page Description">
-
-                    </textarea>
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-md-6 col-md-offset-3">
-                    <input type="submit" name="name" class="btn btn-success" value="Change Description" :disabled="updatingDescription">
-                  </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="x_panel">
-          <div class="x_title">
             <h2>Add Team Member</h2>
             <ul class="nav navbar-right panel_toolbox">
               <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
@@ -76,7 +46,7 @@
 
           <div class="x_content">
             <div class="row">
-              <div v-for="(member, key) in team_page.members" class="col-md-4 col-sm-4 col-xs-12 profile_details">
+              <div v-for="(member, key) in team" class="col-md-4 col-sm-4 col-xs-12 profile_details">
                 <div class="well profile_view">
                   <div class="col-sm-12">
                     <div class="left col-xs-7">
@@ -102,10 +72,8 @@
 </template>
 
 <script>
-import firebase from 'firebase';
 import AddContributor from '~/components/admin/events/AddContributor.vue';
 
-const teamPageRef = firebase.database().ref('team_page');
 export default {
   name: 'TeamPage',
   components: {
@@ -117,31 +85,11 @@ export default {
     return {
       newMember: null,
       updatingDescription: false,
-      addingMember: false
+      addingMember: false,
+      team: []
     };
   },
-  firebase: {
-    team_page: {
-      source: teamPageRef,
-      asObject: true
-    }
-  },
   methods: {
-    changeTeamDescription() {
-      let description = {
-        description: this.team_page.description
-      };
-      this.updatingDescription = true;
-      this.$firebaseRefs.team_page.update(description, error => {
-        if (error) {
-          console.log(error);
-          alert(`Issue Updating Description: ${error.message}`);
-        } else {
-          alert('Description successfully modified');
-        }
-        this.updatingDescription = false;
-      });
-    },
     addProfile(member) {
       console.log(member);
       this.newMember = {
@@ -152,21 +100,9 @@ export default {
     },
     addTeamMember() {
       this.addingMember = true;
-      teamPageRef
-        .child('members')
-        .push(this.newMember)
-        .then(() => {
-          this.addingMember = false;
-          alert('Member successfully added');
-        })
-        .catch(error => {
-          this.addingMember = false;
-          alert(`Issue adding member: ${error.message}`);
-        });
     },
     removeMember(key) {
       console.log(`Removing key: ${key}`);
-      teamPageRef.child(`members/${key}`).remove();
     }
   }
 };

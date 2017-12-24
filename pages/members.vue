@@ -31,7 +31,7 @@
               <!-- Members List -->
               <div class="members__list">
                   <!-- Members List Item -->
-                  <div @click="becomeMember" class="members__list__item add-member text-center">
+                  <div @click="becomeMember" v-if="!currentUser" class="members__list__item add-member text-center">
                       <div class="members__item__container">
                           <div class="members__icon">
                               <svg class="icon-adduser icon-lg"><use xlink:href="img/icons.svg#icon-adduser"></use></svg>
@@ -62,7 +62,6 @@
                           <div class="members__skilllist">{{ displaySkills(member.skills) }}</div>
                       </div>
                   </div>
-
               </div>
           </div>
       </section>
@@ -74,20 +73,15 @@
 
 <script>
 import Algolia from 'algoliasearch';
-import firebase from 'firebase';
 import { debounce } from 'lodash';
-
-import AddSubscriber from '~/components/site/AddSubscriber.vue';
+import { mapActions, mapGetters } from 'vuex';
 
 const algoliaClient = new Algolia(
-  '3O8L0EHCV6',
-  '684c18cb580eed969bb80b18c2dab3f7'
+  process.env.algoliaAppId,
+  process.env.algoliaSearchKey
 );
 export default {
   name: 'MembersPage',
-  components: {
-    AddSubscriber
-  },
   beforeCreate() {
     this.membersSearch = algoliaClient.initIndex('members');
     this.membersSearch
@@ -107,6 +101,7 @@ export default {
     };
   },
   methods: {
+    ...mapActions(['firebaseLogin']),
     displaySkills(skills) {
       if (skills) return skills.join(', ');
       return '';
@@ -136,27 +131,19 @@ export default {
     }, 500),
     becomeMember() {
       this.query = '';
-      let provider = new firebase.auth.TwitterAuthProvider();
-      provider.setCustomParameters({ screen_name: 'forLoopAfrica' });
-      firebase
-        .auth()
-        .signInWithPopup(provider)
-        .then(result => {
-          let photoUrl = result.user.photoURL.replace(/_normal/, '');
-          this.member = {
-            photoUrl: photoUrl,
-            displayName: result.user.displayName,
-            uid: result.user.uid
-          };
-
-          let details = this.membersPage.members[this.member.uid]; // get existing member detail if it exist
-          if (details) this.member = Object.assign({}, details, this.member);
+      return this.firebaseLogin()
+        .then(() => {
+          this.$toast.success('Succesfully registered');
+          this.$router.push('/profile');
         })
         .catch(function(error) {
           console.log(error);
-          alert(`Please try again: ${error.message}`);
+          this.$toast.error(`${error.message}`);
         });
     }
+  },
+  computed: {
+    ...mapGetters(['currentUser'])
   },
   watch: {
     query(query) {

@@ -3,12 +3,12 @@
     <button class="navbar-toggler mobile-sidebar-toggler d-lg-none" type="button" @click="mobileSidebarToggle">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <b-link class="navbar-brand" to="#"></b-link>
+    <b-link class="navbar-brand" to="/"></b-link>
     <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" @click="sidebarToggle">
       <span class="navbar-toggler-icon"></span>
     </button>
     <b-navbar-nav class="d-md-down-none">
-      <b-nav-item class="px-3" :to="{path: '/'}">Dashboard</b-nav-item>
+      <b-nav-item class="px-3" :to="{path: '/admin/dashboard'}">Dashboard</b-nav-item>
     </b-navbar-nav>
     <b-navbar-nav class="ml-auto">
       <HeaderDropdown/>

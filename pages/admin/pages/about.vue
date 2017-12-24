@@ -1,7 +1,7 @@
 <template>
 
   <!-- page content -->
-  <div class="">
+  <div class="animated fadeIn">
     <h1>About Page</h1>
     <div class="row">
       <div class="col-md-12">
@@ -13,22 +13,6 @@
               </li>
             </ul>
             <div class="clearfix"></div>
-          </div>
-          <div class="x_content">
-            <form class="" @submit.prevent="changeAboutDescription">
-              <div class="row">
-                  <div class="col-md-6 col-md-offset-3">
-                    <textarea v-model="about_page.description" name="description" placeholder="About Page Description">
-
-                    </textarea>
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-md-6 col-md-offset-3">
-                    <input type="submit" name="name" class="btn btn-success" value="Change Description" :disabled="updatingDescription">
-                  </div>
-              </div>
-            </form>
           </div>
         </div>
       </div>
@@ -48,7 +32,7 @@
             <form class="" @submit.prevent="uploadImages">
               <div class="row">
                 <div class="col-md-6">
-                  <input @change="onFileChange" type="file" class="form-control" placeholder="Upload Images" multiple>
+                  <input type="file" class="form-control" placeholder="Upload Images" multiple>
                 </div>
                 <div class="col-md-3">
                   <button type="submit" class="btn btn-primary" :disabled="uploadingImages">Upload Images</button>
@@ -103,10 +87,6 @@
 </template>
 
 <script>
-import firebase from 'firebase';
-
-const aboutPageRef = firebase.database().ref('about_page');
-const aboutPageImageRef = firebase.storage().ref('about_page');
 export default {
   name: 'AboutPage',
   // lifecycle methods
@@ -114,65 +94,15 @@ export default {
     return {
       updatingDescription: false,
       uploadingImages: false,
-      imageFiles: []
+      imageFiles: [],
+      about_page: {
+        images: []
+      }
     };
   },
-
-  firebase: {
-    about_page: {
-      source: aboutPageRef,
-      asObject: true
-    }
-  },
   methods: {
-    changeAboutDescription() {
-      let description = {
-        description: this.about_page.description
-      };
-      this.updatingDescription = true;
-      this.$firebaseRefs.about_page.update(description, error => {
-        if (error) {
-          console.log(error);
-          alert(`Issue Updating Description: ${error.message}`);
-        } else {
-          alert('Description successfully modified');
-        }
-        this.updatingDescription = false;
-      });
-    },
     uploadImages() {
       this.uploadingImages = true;
-      let imagesPromise = this.imageFiles.map(file => {
-        return aboutPageImageRef.child(file.name).put(file);
-      });
-      Promise.all(imagesPromise)
-        .then(snapshots => {
-          snapshots.forEach((snapshot, index) => {
-            let image = {
-              image_url: snapshot.downloadURL,
-              order: index
-            };
-            aboutPageRef.child('images').push(image);
-          });
-          this.uploadingImages = false;
-          alert('Images Uploaded');
-        })
-        .catch(error => {
-          this.uploadImages = false;
-          console.log(error);
-          alert('Issue Uploading Images');
-        });
-    },
-    onFileChange(e) {
-      this.imageFiles = [];
-      var files = e.target.files || e.dataTransfer.files;
-      if (!files.length) return;
-      for (let i = 0; i < files.length; i++) this.imageFiles.push(files[i]);
-    },
-    removeImage(key) {
-      console.log(`removing ${key}`);
-      this.$firebaseRefs.about_page.child(`images/${key}`).remove();
-      alert('Image successfully removed');
     }
   }
 };

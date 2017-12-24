@@ -4,9 +4,6 @@
       <section class="about">
           <div class="container">
               <h1 class="about__title">The forLoop Team</h1>
-              <p class="about__content">
-                {{team_page.description}}
-              </p>
           </div>
       </section>
 
@@ -14,7 +11,7 @@
       <section class="teams">
           <div class="team__list">
               <!-- Teams List Item -->
-              <div v-for="(member, index) in team_page.members" :key="index" class="team__list__item position-relative" :style="{ backgroundImage: 'url(\''+member.profile_image+'\')'}">
+              <div v-for="(member, index) in members" :key="index" class="team__list__item position-relative" :style="{ backgroundImage: 'url(\''+member.profile_image+'\')'}">
                   <div class="team__list__item__container">
                       <div class="team__list__item__name">{{member.name}}</div>
                       <div class="team__list__item__handle">
@@ -35,17 +32,23 @@
 
 
 <script>
-import AddSubscriber from '~/components/site/AddSubscriber.vue';
-
 export default {
   name: 'TeamPage',
-  components: {
-    AddSubscriber
-  },
   data() {
     return {
-      team_page: {}
+      members: []
     };
+  },
+  asyncData({ app }) {
+    return app.$axios
+      .$get(`/team`)
+      .then(res => {
+        return { members: res.data };
+      })
+      .catch(e => {
+        console.log('error', e.config);
+        return {};
+      });
   }
 };
 </script>

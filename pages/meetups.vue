@@ -7,23 +7,12 @@
           </div>
       </section>
 
-      <div class="tab__section">
-          <!-- tabs -->
-          <div class="tab-nav list-group">
-              <div class="tab-nav__item active">
-                  <a href="#upcomingMeetups" role="tab" data-toggle="tab" class="tab-nav__link">Upcoming Meetups</a>
-              </div>
-              <div class="tab-nav__item">
-                  <a href="#archivedMeetups" role="tab" data-toggle="tab" class="tab-nav__link">Archived Meetups</a>
-              </div>
-          </div>
-
-
+      <b-tabs class="tab__section" nav-wrapper-class="d-flex">
           <div class="container">
               <!-- Tab contents -->
               <div class="tab-content">
                   <!-- Upcoming Meetups -->
-                  <div id="upcomingMeetups" class="tab-content__item active">
+                  <b-tab id="upcomingMeetups" class="tab-content__item" title="Upcoming Meetups">
 
                       <div class="outer-container">
                           <!-- Meeting Item -->
@@ -32,7 +21,7 @@
                                   <div class="meeting__item__content__top">
                                       <nuxt-link :to="{ name: 'event', params: { slug: upcomingEvent.url_slug }}" class="meeting__item__title">{{ upcomingEvent.title }}</nuxt-link>
                                       <p class="meeting__item__location">{{ upcomingEvent.location.name }}</p>
-                                      <p class="meeting__item__date">{{ upcomingEvent.when.date | formatDate('dddd MMM d yyyy') }}</p>
+                                      <p class="meeting__item__date">{{ Number(upcomingEvent.when.date) | formatDate('dddd MMM d yyyy') }}</p>
                                   </div>
 
                                   <div v-if="upcomingEvent.hosts" class="meeting__item__host">
@@ -60,9 +49,9 @@
                           </div>
                       </div>
 
-                  </div>
+                  </b-tab>
                   <!-- Archived Meetups -->
-                  <div id="archivedMeetups" class="tab-content__item">
+                  <b-tab id="archivedMeetups" class="tab-content__item" title="Archived Meetups">
 
                       <div class="outer-container">
                           <!-- Meeting Item -->
@@ -71,7 +60,7 @@
                                   <div class="meeting__item__content__top">
                                       <nuxt-link :to="{ name: 'events-id', params: { id: archivedEvent.url_slug }}" class="meeting__item__title">{{ archivedEvent.title }}</nuxt-link>
                                       <p class="meeting__item__location">{{ archivedEvent.location.name }}</p>
-                                      <p class="meeting__item__date">{{ archivedEvent.when.date | formatDate('dddd MMM d YYYY') }}</p>
+                                      <p class="meeting__item__date">{{ Number(archivedEvent.when.date) | formatDate('dddd MMM d YYYY') }}</p>
                                   </div>
 
                                   <div v-if="archivedEvent.hosts" class="meeting__item__host">
@@ -96,10 +85,10 @@
                           </div>
                       </div>
 
-                  </div>
+                  </b-tab>
               </div>
           </div>
-      </div>
+      </b-tabs>
 
       <add-subscriber></add-subscriber>
     </div>
@@ -107,14 +96,9 @@
 
 
 <script>
-import AddSubscriber from '~/components/site/AddSubscriber.vue';
-
 const today = new Date().getTime();
 export default {
   name: 'MeetupsPage',
-  components: {
-    AddSubscriber
-  },
   data() {
     return {
       upcomingEvents: [],
@@ -139,5 +123,9 @@ export default {
 </script>
 
 <style>
+
+ul.nav-tabs{
+  margin: 0 auto;
+}
 
 </style>

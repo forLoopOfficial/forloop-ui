@@ -5,7 +5,9 @@ module.exports = {
   env: {
     firebaseApiUrl: process.env.FIREBASE_API_URL,
     firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,
-    firebaseStorageBucket: process.env.FIREBASE_STORAGE_BUCKET
+    firebaseStorageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    algoliaAppId: process.env.ALGOLIA_APP_ID,
+    algoliaSearchKey: process.env.ALGOLIA_SEARCH_KEY
   },
   /*
   ** Router config
@@ -45,6 +47,9 @@ module.exports = {
   ** Customize the progress bar color
   */
   loading: { color: '#3B8070' },
+  render: {
+    resourceHints: false
+  },
   /*
   ** Build configuration
   */
@@ -66,9 +71,9 @@ module.exports = {
       'axios',
       'firebase/app',
       'firebase/auth',
+      'firebase/storage',
       'algoliasearch',
       'jquery',
-      'bootstrap',
       'lodash'
     ],
     plugins: [
@@ -76,15 +81,14 @@ module.exports = {
       new webpack.ProvidePlugin({
         $: 'jquery',
         jQuery: 'jquery',
-        'window.jQuery': 'jquery',
-        Popper: 'popper.js'
+        'window.jQuery': 'jquery'
       })
     ]
   },
   plugins: [
     '~plugins/filters.js',
-    '~plugins/bootstrap-setup.js',
-    { src: '~plugins/firebase.js', ssr: false }
+    { src: '~plugins/firebase.js', ssr: true },
+    { src: '~plugins/globals.js', ssr: true }
   ],
   modules: ['@nuxtjs/axios', '@nuxtjs/toast', 'bootstrap-vue/nuxt'],
   axios: {

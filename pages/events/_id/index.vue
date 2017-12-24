@@ -25,7 +25,7 @@
               <!-- Hero Event details content content -->
               <div class="hero__event__item__content">
                 <!-- Hero Event date -->
-                <p class="hero__event__item__content__text">{{ event.when.date | formatDate('dddd MMM d YYYY') }}</p>
+                <p class="hero__event__item__content__text">{{ Number(event.when.date) | formatDate('dddd MMM d YYYY') }}</p>
                 <!-- Hero Event time -->
                 <p class="hero__event__item__content__text">{{ eventTime }}</p>
               </div>
@@ -194,41 +194,11 @@
     </section>
 
     <g-map :location="event.location"></g-map>
-    <!-- Modal content -->
-    <!-- <b-modal :closeOnBackdrop='false' id="confirmModal">
-      <div slot="modal-header">
-        <h4 class="modal-title" id="myModalLabel" style="text-align:center">Confirm Attendance</h4>
-      </div>
-      <div slot="modal-body">
-        <transition name="custom-leave" leave-active-class="animated bounceOutRight">
-          <form v-if="!isAttendant" @submit.prevent="confirmAttendance" class="form-horizontal form-label-left">
-            <div class="form-group">
-              <label class="control-label col-md-3 col-sm-3 col-xs-12">Email</label>
-              <div class="col-md-9 col-sm-9 col-xs-12">
-                <input v-model="email" type="text" class="form-control" placeholder="Email" required>
-              </div>
-            </div>
-          </form>
-        </transition>
-        </transition>
-        <transition name="custom-enter" enter-active-class="animated tada">
-          <div v-if="isAttendant" class="jumbotron__action jumbotron__action--maxsize" style="text-align:center">
-            <h2>Successfully registered for event</h2>
-          </div>
-        </transition>
-      </div>
-      <div slot="modal-footer">
-        <button v-if="!isAttendant" @click="confirmAttendance" type="button" class="btn btn-primary">Save</button>
-        <button v-if="isAttendant" @click="close" type="button" class="btn btn-primary">Dismiss</button>
-      </div>
-    </b-modal> -->
-    <!-- Modal content -->
   </div>
 </template>
 
 
 <script>
-import firebase from 'firebase';
 import { mapActions, mapGetters } from 'vuex';
 import { isEmpty } from 'lodash';
 
@@ -263,47 +233,38 @@ export default {
       });
   },
   methods: {
-    ...mapActions(['login']),
+    ...mapActions(['firebaseLogin']),
     attendEvent() {
       // user already exist don't bother with twitter auth again
       if (this.currentUser) {
-        return this.$axios
-          .$post(`/events/${this.event._id}/attend`)
-          .then(res => {
-            alert('attending');
-          })
-          .catch(e => {
-            console.log('error', e.config);
-            // error({
-            //   statusCode: e.status || 500,
-            //   message: 'Issue attending event'
-            // });
-          });
+        return this.reserve();
       }
-
-      const provider = new firebase.auth.TwitterAuthProvider();
-      provider.setCustomParameters({ screen_name: 'forLoopNigeria' });
-      firebase
-        .auth()
-        .signInWithPopup(provider)
-        .then(result => {
-          console.log('user', result);
-          const user = result.user;
-          // this.login({token: user.})
-          // this.$root.$emit('show::modal', 'confirmModal');
-          return user.getIdToken();
+      return this.firebaseLogin()
+        .then(() => {
+          return this.reserve();
         })
-        .then(token => {
-          console.log('token', token);
-          return this.login({ token });
-          // this.$root.$emit('show::modal', 'confirmModal');
+        .then(() => {
+          this.$toast.success('Succesfully reserved');
         })
         .catch(function(error) {
           console.log(error);
-          alert(`Please try again: Issue Authenticating with Twitter`);
+          alert(`Please try again: ${error.message}`);
         });
     },
-
+    reserve() {
+      return this.$axios
+        .$post(`/events/${this.event._id}/attend`)
+        .then(res => {
+          alert('attending');
+        })
+        .catch(e => {
+          console.log('error', e.config);
+          // error({
+          //   statusCode: e.status || 500,
+          //   message: 'Issue attending event'
+          // });
+        });
+    },
     addAttendee() {
       // check if the user is already attending
       const attending = this.event.attending.find(

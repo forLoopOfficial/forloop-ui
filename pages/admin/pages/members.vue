@@ -7,36 +7,6 @@
       <div class="col-md-12">
         <div class="x_panel">
           <div class="x_title">
-            <h2>Change Members Page Description</h2>
-            <ul class="nav navbar-right panel_toolbox">
-              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-              </li>
-            </ul>
-            <div class="clearfix"></div>
-          </div>
-          <div class="x_content">
-            <form class="" @submit.prevent="changeMembersDescription">
-              <div class="row">
-                  <div class="col-md-6 col-md-offset-3">
-                    <textarea v-model="members_page.description" name="description" placeholder="Members Page Description">
-
-                    </textarea>
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-md-6 col-md-offset-3">
-                    <input type="submit" name="name" class="btn btn-success" value="Change Description" :disabled="updatingDescription">
-                  </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="x_panel">
-          <div class="x_title">
             <h2>Public Members</h2>
             <ul class="nav navbar-right panel_toolbox">
               <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
@@ -47,7 +17,7 @@
 
           <div class="x_content">
             <div class="row">
-              <div v-for="(member, key) in members_page.members" :key="key" class="col-md-4 col-sm-4 col-xs-12 profile_details">
+              <div v-for="(member, key) in members" :key="key" class="col-md-4 col-sm-4 col-xs-12 profile_details">
                 <div class="well profile_view">
                   <div class="col-sm-12">
                     <div class="left col-xs-7">
@@ -73,42 +43,17 @@
 </template>
 
 <script>
-import firebase from 'firebase';
-
-const membersPageRef = firebase.database().ref('members_page');
 export default {
   name: 'MembersPage',
   // lifecycle methods
 
   data() {
     return {
-      newMember: null,
-      updatingDescription: false,
-      addingMember: false
+      members: []
     };
   },
-  firebase: {
-    members_page: {
-      source: membersPageRef,
-      asObject: true
-    }
-  },
   methods: {
-    changeMembersDescription() {
-      let description = {
-        description: this.members_page.description
-      };
-      this.updatingDescription = true;
-      this.$firebaseRefs.members_page.update(description, error => {
-        if (error) {
-          console.log(error);
-          alert(`Issue Updating Description: ${error.message}`);
-        } else {
-          alert('Description successfully modified');
-        }
-        this.updatingDescription = false;
-      });
-    }
+    changeMembersDescription() {}
   }
 };
 </script>

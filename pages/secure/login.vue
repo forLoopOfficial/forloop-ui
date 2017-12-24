@@ -2,7 +2,7 @@
   <div class="app flex-row align-items-center">
     <div class="container">
       <b-row class="justify-content-center">
-        <b-col md="8">
+        <b-col md="12">
           <b-card-group>
             <b-card no-body class="p-4">
               <b-card-body>

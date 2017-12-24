@@ -9,6 +9,9 @@
             <template slot="published" scope="data">
               <b-badge :variant="getBadge(data.item.published)">{{getStatus(data.item.published)}}</b-badge>
             </template>
+            <template slot="title" scope="data">
+              <nuxt-link :to="goto(data.item)">{{data.item.title}}</nuxt-link>
+            </template>
             <template slot="when" scope="data">
               {{data.item.when.date_formatted}}
               <p>FROM: {{data.item.when.from.h}}:{{data.item.when.from.mm}} {{data.item.when.from.A}}</p>
@@ -65,7 +68,7 @@ export default {
   },
   asyncData({ app }) {
     return app.$axios
-      .$get(`/events`)
+      .$get(`/events`, { params: { published: 'all' } })
       .then(res => {
         return { events: res.data };
       })
@@ -83,6 +86,9 @@ export default {
     },
     getRowCount(items) {
       return items.length;
+    },
+    goto(event) {
+      return `/admin/events/${event._id}`;
     }
   }
 };

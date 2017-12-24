@@ -48,6 +48,7 @@ export default {
       name: 'Users',
       url: '/icons',
       icon: 'icon-user',
+      role: 'superadmin',
       children: [
         {
           name: 'View',
@@ -71,7 +72,7 @@ export default {
         },
         {
           name: 'Member',
-          url: '/pages/member',
+          url: '/pages/members',
           icon: 'icon-star'
         },
         {
@@ -92,6 +93,11 @@ export default {
           icon: 'icon-list'
         }
       ]
+    },
+    {
+      name: 'Countries',
+      url: '/countries',
+      icon: 'icon-list'
     }
   ]
 };
