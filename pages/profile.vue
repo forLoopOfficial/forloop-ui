@@ -102,7 +102,7 @@ export default {
         'twitter',
         'skills'
       ]);
-      console.log('updated profile', changes);
+      console.log('updated profile', changes, tis.user);
       this.$axios
         .$put('/members/profile', changes)
         .then(response => {
