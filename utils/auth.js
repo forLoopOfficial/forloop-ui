@@ -10,11 +10,13 @@ export const setToken = token => {
 
 export const unsetToken = () => {
   if (process.SERVER_BUILD) return;
-  window.localStorage.removeItem('token');
-  window.localStorage.removeItem('user');
-  window.localStorage.removeItem('secret');
+  if (process.browser) {
+    window.localStorage.removeItem('token');
+    window.localStorage.removeItem('user');
+    window.localStorage.removeItem('secret');
+    window.localStorage.setItem('logout', Date.now());
+  }
   Cookie.remove('jwt');
-  window.localStorage.setItem('logout', Date.now());
 };
 
 export const getUserFromCookie = req => {

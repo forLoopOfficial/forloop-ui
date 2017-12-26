@@ -29,7 +29,7 @@
       <section class="members">
           <div class="container">
               <!-- Members List -->
-              <div class="members__list">
+              <div class="members__list" style="overflow: auto;">
                   <!-- Members List Item -->
                   <div @click="becomeMember" v-if="!currentUser" class="members__list__item add-member text-center">
                       <div class="members__item__container">
@@ -62,6 +62,9 @@
                           <div class="members__skilllist">{{ displaySkills(member.skills) }}</div>
                       </div>
                   </div>
+                  <no-ssr>
+                    <infinite-loading force-use-infinite-wrapper="true" @infinite="loadMore" ref="infiniteLoader"></infinite-loading>
+                  </no-ssr>
               </div>
           </div>
       </section>
@@ -73,8 +76,10 @@
 
 <script>
 import Algolia from 'algoliasearch';
-import { debounce } from 'lodash';
+import { debounce, isEmpty } from 'lodash';
 import { mapActions, mapGetters } from 'vuex';
+
+import InfiniteLoading from 'vue-infinite-loading';
 
 const algoliaClient = new Algolia(
   process.env.algoliaAppId,
@@ -82,10 +87,17 @@ const algoliaClient = new Algolia(
 );
 export default {
   name: 'MembersPage',
+  components: {
+    InfiniteLoading
+  },
   beforeCreate() {
     this.membersSearch = algoliaClient.initIndex('members');
     this.membersSearch
-      .search('')
+      .search({
+        query: '',
+        page: 0,
+        hitsPerPage: 8
+      })
       .then(results => {
         this.members = results.hits;
       })
@@ -97,7 +109,12 @@ export default {
       membersPage: {},
       member: {},
       members: [],
-      query: ''
+      query: '',
+      search: {
+        query: '',
+        page: 0,
+        hitsPerPage: 16
+      }
     };
   },
   methods: {
@@ -119,11 +136,13 @@ export default {
       }
       return url;
     },
-    searchMembers: debounce(function(query) {
-      this.membersSearch
-        .search(query)
+    searchMembers: debounce(function() {
+      return this.membersSearch
+        .search(this.search)
         .then(results => {
+          // replace content of array
           this.members = results.hits;
+          this.$refs.infiniteLoader.$emit('$InfiniteLoading:reset');
         })
         .catch(err => {
           console.log(err);
@@ -140,6 +159,24 @@ export default {
           console.log(error);
           this.$toast.error(`${error.message}`);
         });
+    },
+    loadMore($state) {
+      this.search.page += 1;
+      return this.membersSearch
+        .search(this.search)
+        .then(results => {
+          // needed to trigger vue update
+          this.members = this.members.concat(results.hits);
+          if (isEmpty(results.hits)) {
+            $state.complete();
+          } else {
+            $state.loaded();
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          $state.complete();
+        });
     }
   },
   computed: {
@@ -147,9 +184,14 @@ export default {
   },
   watch: {
     query(query) {
-      if (query !== '') {
-        this.searchMembers(query);
-      }
+      // reset paramemeter during search
+      this.search = {
+        query,
+        page: 0,
+        offset: 0,
+        hitsPerPage: 8
+      };
+      this.searchMembers();
     }
   }
 };
