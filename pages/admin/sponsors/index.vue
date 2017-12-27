@@ -1,5 +1,4 @@
 <template>
-
   <!-- page content -->
   <div class="animated fadeIn">
     <b-row>
@@ -62,9 +61,9 @@ export default {
     },
     fetchData() {
       return this.$axios
-        .$get(`/countries`)
+        .$get(`/sponsors`)
         .then(res => {
-          return (this.countries = res.data);
+          this.sponsors = res.data;
         })
         .catch(e => {
           console.log('error', e.response);

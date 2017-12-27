@@ -12,6 +12,9 @@
             <template slot="title" scope="data">
               <nuxt-link :to="goto(data.item)">{{data.item.title}}</nuxt-link>
             </template>
+            <template slot="country" scope="data">
+              <p>{{data.item.country && data.item.country.name}}</p>
+            </template>
             <template slot="when" scope="data">
               {{data.item.when.date_formatted}}
               <p>FROM: {{data.item.when.from.h}}:{{data.item.when.from.mm}} {{data.item.when.from.A}}</p>

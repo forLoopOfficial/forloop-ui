@@ -84,7 +84,7 @@ export default {
   methods: {
     confirmMember() {},
     parseLink(token, type) {
-      if (token == undefined) return;
+      if (token === undefined) return;
 
       let url = '';
       if (token.indexOf(type) === 0 || token.indexOf('www') === 0) {

@@ -9,7 +9,7 @@
   </div>
   <div class="inner">
     <input v-model="twitterHandle" class="twitter_input" placeholder="Add by Twitter handle" type="text">
-    <button @click="addContributor" class="btn btn-xs btn-primary">Add</button>
+    <button @click="addContributor" class="btn btn-xs btn-primary" type="button">Add</button>
   </div>
 </div>
 
@@ -42,22 +42,21 @@ export default {
       this.getHandleDetails(this.twitterHandle);
     },
     getHandleDetails(handle) {
-      let url = `/api/twitterprofile/${handle}`;
-      this.$http.get(url).then(
-        response => {
-          let body = response.body;
-          if (body.errors) {
-            this.showErrors(body.errors);
+      let url = `/miscs/twitterprofile/${handle}`;
+      this.$axios
+        .$get(url)
+        .then(res => {
+          if (res.error) {
+            this.showErrors(res.error);
             return;
           }
-          this.emitContributor(body);
-        },
-        error => {
-          console.log(error);
-          this.errorMessage = error.statusText;
-          this.show = true;
-        }
-      );
+          this.emitContributor(res.data);
+        })
+        .catch(e => {
+          if (e.response && e.response.status === 400) {
+            this.showErrors(e.response.data.error);
+          }
+        });
     },
     emitContributor(contributor) {
       let profileImage = contributor.profile_image_url_https.replace(
@@ -69,7 +68,7 @@ export default {
         screen_name: contributor.screen_name,
         description: contributor.description,
         profile_image: profileImage,
-        twitterURL: `https://twitter.com/${contributor.screen_name}`
+        twitter_url: `https://twitter.com/${contributor.screen_name}`
       };
       this.$emit('add', this.contributor);
       this.twitterHandle = '';

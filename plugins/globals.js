@@ -7,7 +7,7 @@ Vue.component('AddSubscriber', AddSubscriber);
 // Include bootstrap JS only
 if (process.browser) {
   const timepicker = require('vue2-timepicker').default; // hack for es6 modules
-  const datepicker = require('vuejs-datepicker').default;
+  const datepicker = require('vuejs-datepicker');
   const places = require('vue-places').default;
   const flickity = require('vue-flickity').default;
   Vue.component('Places', places);

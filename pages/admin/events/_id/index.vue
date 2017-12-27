@@ -10,7 +10,7 @@
     <b-row>
       <b-col sm="12">
         <b-card :header="caption">
-          <b-form @submit="save">
+          <b-form @submit.prevent="save">
             <b-form-group id="titleGroup1"
                           label="Title:"
                           description="Event's Title">
@@ -27,12 +27,9 @@
               </b-form-checkbox>
             </b-form-group>
             <b-form-group id="dateGroup1" label="Date:">
-              <b-form-input id="dateInput1"
-                            type="date"
-                            v-model="eventTime"
-                            required
-                            placeholder="When is it happening?">
-              </b-form-input>
+              <no-ssr>
+                <vue-datepicker format="D MMM d" v-model="eventTime" placeholder="When is it happening?" required></vue-datepicker>
+              </no-ssr>
             </b-form-group>
             <b-form-group id="timeGroup1" label="Enter Time:">
               <no-ssr>
@@ -61,6 +58,9 @@
                   <option :value="null" disabled>-- Please select an option --</option>
                 </template>
               </b-form-select>
+            </b-form-group>
+            <b-form-group id="bgImageGroup1" label="Background Image:">
+              <b-form-file id="event_background" v-model="tempBackground" accept="image/jpeg,image/x-png,.png" placeholder="Change background"></b-form-file>
             </b-form-group>
             <b-form-group id="descGroup1" label="Description:">
               <b-form-textarea id="descInput1"
@@ -135,8 +135,8 @@
 </template>
 
 <script>
-/* global $:true google:true  */
-import { assign } from 'lodash';
+/* global google:true  */
+import { assign, omit } from 'lodash';
 import firebase from 'firebase';
 import moment from 'moment';
 import AddContributor from '~/components/admin/events/AddContributor.vue';
@@ -157,7 +157,15 @@ export default {
       tempBackground: '',
       imageLink: null,
       updating: false,
-      event: {}
+      event: {},
+      omit: [
+        '_id',
+        'url_slug',
+        'attendees',
+        'created_at',
+        'updated_at',
+        'created_by'
+      ] // fields to omit in event object
     };
   },
   asyncData({ app, route }) {
@@ -186,30 +194,94 @@ export default {
   },
 
   methods: {
-    setEventLatLng() {
+    save() {
+      this.updating = true;
+      this.setEventLatLng()
+        .then(() => this.uploadBackgroundImage())
+        .then(() => this.uploadResources())
+        .then(() => {
+          // send to api to create
+          const changes = omit(this.event, this.omit);
+          const url = `/events/${this.event._id}`;
+          return this.$axios.$put(url, changes);
+        })
+        .then(() => {
+          this.$toast.success('Event successfully updated');
+        })
+        .catch(error => {
+          this.updating = false;
+          this.$toast.error(error.message);
+        });
+    },
+    async setEventLatLng() {
       if (google) {
         let geocoder = new google.maps.Geocoder();
-        geocoder.geocode(
-          { address: this.event.location.address },
-          (results, status) => {
-            if (status === 'OK') {
-              let location = results[0].geometry.location;
-              this.event.location.lat = location.lat();
-              this.event.location.lng = location.lng();
-              this.updateEventPhase2();
-            } else {
-              alert(
-                `Geocode was not successful for the following reason: ${
-                  status
-                } \n Please modify location `
-              );
-              this.updating = false;
+        return new Promise((resolve, reject) => {
+          geocoder.geocode(
+            { address: this.event.location.address },
+            (results, status) => {
+              if (status === 'OK') {
+                let location = results[0].geometry.location;
+                this.event.location.lat = location.lat();
+                this.event.location.lng = location.lng();
+                resolve();
+              } else {
+                reject(
+                  new Error(
+                    `Geocode was not successful for the following reason: ${
+                      status
+                    } \n Please modify location `
+                  )
+                );
+              }
             }
-          }
-        );
+          );
+        });
       } else {
-        alert('Geocoder not found. Unable to get location lat/lng');
         this.updating = false;
+        throw new Error(
+          'Geocoder not found. Unable to get location lat/lng try refreshing page'
+        );
+      }
+    },
+    async uploadResources() {
+      if (this.tempResource !== '') {
+        let resourceName = `${new Date().getTime()}_${this.tempResource.name}`;
+        let eventResRef = resourceStorage.child(
+          `${this.event.id}/resources/${resourceName}`
+        );
+        return eventResRef
+          .put(this.tempResource, { type: 'resource' })
+          .then(snapshot => {
+            this.event.resource_url = snapshot.downloadURL;
+          })
+          .catch(error => {
+            console.log(error);
+            throw new Error('Issue uploading resources... Please try again');
+          });
+      }
+    },
+    async uploadBackgroundImage() {
+      if (this.tempBackground !== '') {
+        let backgroundName = `${new Date().getTime()}_${
+          this.tempBackground.name
+        }`;
+        let eventBackgroundRef = resourceStorage.child(
+          `${this.event.id}/backgrounds/${backgroundName}`
+        );
+        return eventBackgroundRef
+          .put(this.tempBackground, {
+            type: 'background-image'
+          })
+          .then(snapshot => {
+            this.event.background_image_url = snapshot.downloadURL;
+          })
+          .catch(error => {
+            this.saving = false;
+            throw new Error(
+              `Issue uploading background image: ${error.message}`
+            );
+          });
       }
     },
     addSpeaker(contributor) {
@@ -241,69 +313,11 @@ export default {
     removeSponsor(index) {
       this.event.sponsors.splice(index, 1);
     },
-
     changeResource(e) {
       var files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
 
       this.tempResource = files[0];
-    },
-    save() {
-      this.updating = true;
-      this.setEventLatLng();
-    },
-    updateEventPhase2() {
-      if (this.tempResource !== '' || this.tempBackground !== '') {
-        let updates = [];
-        if (this.tempResource !== '') {
-          let resourceName = `${new Date().getTime()}_${
-            this.tempResource.name
-          }`;
-          let eventResRef = resourceStorage.child(
-            `${this.event.id}/resources/${resourceName}`
-          );
-          updates.push(
-            eventResRef.put(this.tempResource, { type: 'resource' })
-          );
-        }
-        if (this.tempBackground !== '') {
-          let backgroundName = `${new Date().getTime()}_${
-            this.tempBackground.name
-          }`;
-          let eventBackgroundRef = resourceStorage.child(
-            `${this.event.id}/backgrounds/${backgroundName}`
-          );
-          updates.push(
-            eventBackgroundRef.put(this.tempBackground, {
-              type: 'background-image'
-            })
-          );
-        }
-        Promise.all(updates)
-          .then(results => {
-            results.forEach(snapshot => {
-              if (snapshot.metadata.type === 'resource') {
-                this.event.resourceUrl = snapshot.downloadURL;
-              } else {
-                this.event.background_image_url = snapshot.downloadURL;
-              }
-            });
-          })
-          .catch(error => {
-            console.log(error);
-            alert('Issue updating event... Please try again');
-            this.updating = false;
-          });
-      }
-    },
-    changeBackground(e) {
-      var files = e.target.files || e.dataTransfer.files;
-      if (!files.length) return;
-
-      this.tempBackground = files[0];
-    },
-    openFileDialog() {
-      $('#fopenImage').trigger('click');
     }
   },
 
@@ -316,6 +330,9 @@ export default {
       // setter
       set: function(newDate) {
         this.event.when.date = newDate.getTime();
+        this.event.when.date_formatted = moment(
+          Number(this.event.when.date)
+        ).format('dddd MMM D YYYY');
       }
     },
     countryOptions() {
