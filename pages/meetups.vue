@@ -19,9 +19,9 @@
                           <div v-for="(upcomingEvent, index) in upcomingEvents" :key="index" class="meeting__item">
                               <div class="meeting__item__content">
                                   <div class="meeting__item__content__top">
-                                      <nuxt-link :to="{ name: 'event', params: { slug: upcomingEvent.url_slug }}" class="meeting__item__title">{{ upcomingEvent.title }}</nuxt-link>
+                                      <nuxt-link :to="{ name: 'events-id', params: { id: upcomingEvent.url_slug }}" class="meeting__item__title">{{ upcomingEvent.title }}</nuxt-link>
                                       <p class="meeting__item__location">{{ upcomingEvent.location.name }}</p>
-                                      <p class="meeting__item__date">{{ Number(upcomingEvent.when.date) | formatDate('dddd MMM d yyyy') }}</p>
+                                      <p class="meeting__item__date">{{ upcomingEvent.when.date_formatted}}</p>
                                   </div>
 
                                   <div v-if="upcomingEvent.hosts" class="meeting__item__host">
@@ -60,7 +60,7 @@
                                   <div class="meeting__item__content__top">
                                       <nuxt-link :to="{ name: 'events-id', params: { id: archivedEvent.url_slug }}" class="meeting__item__title">{{ archivedEvent.title }}</nuxt-link>
                                       <p class="meeting__item__location">{{ archivedEvent.location.name }}</p>
-                                      <p class="meeting__item__date">{{ Number(archivedEvent.when.date) | formatDate('dddd MMM d YYYY') }}</p>
+                                      <p class="meeting__item__date">{{ archivedEvent.when.date_formatted}}</p>
                                   </div>
 
                                   <div v-if="archivedEvent.hosts" class="meeting__item__host">

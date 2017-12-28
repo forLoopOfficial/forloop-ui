@@ -209,6 +209,10 @@ export default {
   components: {
     GMap
   },
+  // lifecycle methods
+  mounted() {
+    this.checkAttendee();
+  },
   data() {
     return {
       isAttendant: false,
@@ -237,46 +241,46 @@ export default {
     attendEvent() {
       // user already exist don't bother with twitter auth again
       if (this.currentUser) {
-        return this.reserve();
+        return this.reserve()
+          .then(event => {
+            this.event = event;
+            this.$toast.success('Succesfully reserved');
+          })
+          .catch(function(error) {
+            console.log(error);
+            this.$toast.error(`${error.message}`);
+          });
       }
       return this.firebaseLogin()
         .then(() => {
           return this.reserve();
         })
-        .then(() => {
+        .then(event => {
+          this.event = event;
           this.$toast.success('Succesfully reserved');
         })
         .catch(function(error) {
           console.log(error);
-          alert(`Please try again: ${error.message}`);
+          this.$toast.error(`${error.message}`);
         });
     },
     reserve() {
       return this.$axios
         .$post(`/events/${this.event._id}/attend`)
         .then(res => {
-          alert('attending');
+          return res.data;
         })
         .catch(e => {
           console.log('error', e.config);
-          // error({
-          //   statusCode: e.status || 500,
-          //   message: 'Issue attending event'
-          // });
+          throw new Error('Issue making reservation please try again');
         });
     },
-    addAttendee() {
+    checkAttendee() {
       // check if the user is already attending
-      const attending = this.event.attending.find(
+      const attending = this.event.attendees.find(
         attendee => attendee._id === this.currentUser._id
       );
-      if (isEmpty(attending)) {
-      }
-      this.isAttendant = true;
-    },
-    close() {
-      this.email = '';
-      this.$root.$emit('hide::modal', 'confirmModal');
+      this.isAttendant = !isEmpty(attending);
     }
   },
 
