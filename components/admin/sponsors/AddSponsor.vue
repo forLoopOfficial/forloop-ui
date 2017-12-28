@@ -2,7 +2,7 @@
   <!-- Component content -->
   <b-modal ref="addSponsorRef" id="addSponsor" title="Add Sponsor(s)">
     <button class="fa fa-plus" type="button" @click="newGroup"></button>
-    <b-form @submit="save">
+    <b-form @submit.prevent="save">
       <template v-for="(sponsor, index) in sponsors">
         <b-form-group id="nameGroup1"
                       label="Name:"

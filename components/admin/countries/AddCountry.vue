@@ -2,7 +2,7 @@
   <!-- Component content -->
   <b-modal ref="addCountryRef" id="addCountry" title="Add Country">
     <button class="fa fa-plus" type="button" @click="newGroup"></button>
-    <b-form @submit="save">
+    <b-form @submit.prevent="save">
       <template v-for="(country, index) in countries">
         <b-form-group id="nameGroup1"
                       label="Name:"
