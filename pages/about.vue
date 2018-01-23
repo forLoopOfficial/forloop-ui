@@ -15,7 +15,7 @@
           <div class="outer-container">
             <no-ssr>
               <flickity ref="flickity" :options="flickityOptions">
-                <img v-for="(image, index) in about_page.metadata.images" :src="image.image_url" :key="index" class="images__section__left hidden--xxs"/>
+                <img v-for="(image, index) in about_page.metadata.images" :src="image.image_url" :key="index" class="images__section__left"/>
               </flickity>
             </no-ssr>
           </div>

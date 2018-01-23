@@ -48,7 +48,7 @@ export default {
       name: 'Users',
       url: '/icons',
       icon: 'icon-user',
-      role: 'superadmin',
+      roles: ['superadmin'],
       children: [
         {
           name: 'View',

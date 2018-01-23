@@ -90,10 +90,19 @@ module.exports = {
     { src: '~plugins/firebase.js', ssr: true },
     { src: '~plugins/globals.js', ssr: true }
   ],
-  modules: ['@nuxtjs/axios', '@nuxtjs/toast', 'bootstrap-vue/nuxt'],
+  modules: [
+    '@nuxtjs/axios',
+    '@nuxtjs/toast',
+    '@nuxtjs/sentry',
+    '@nuxtjs/google-analytics',
+    'bootstrap-vue/nuxt'
+  ],
   axios: {
     baseURL: process.env.API_URL,
     credentials: false
     // debug: true
+  },
+  'google-analytics': {
+    id: process.env.GA_TRACKING_ID
   }
 };

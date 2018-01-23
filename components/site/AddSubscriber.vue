@@ -38,15 +38,12 @@ export default {
   },
   methods: {
     addSubscriber(e) {
-      let formData = new FormData();
-      formData.append('email', this.subscriber);
-      let url = `/subscribe`;
+      const body = {
+        email: this.subscriber
+      };
+      let url = `/miscs/subscribe`;
       this.$axios
-        .$post(url, formData, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        })
+        .$post(url, body)
         .then(res => {
           console.log(res);
           this.hasSubscribed = true;

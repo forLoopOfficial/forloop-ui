@@ -12,7 +12,7 @@
           <template v-else-if="item.divider">
             <SidebarNavDivider :classes="item.class"/>
           </template>
-          <template v-else>
+          <template v-else-if="allowAccess(item)">
             <template v-if="item.children">
               <!-- First level dropdown -->
               <SidebarNavDropdown :name="item.name" :url="item.url" :icon="item.icon">
@@ -48,6 +48,9 @@
   </div>
 </template>
 <script>
+import { isEmpty } from 'lodash';
+import { mapGetters } from 'vuex';
+
 import SidebarFooter from './SidebarFooter';
 import SidebarForm from './SidebarForm';
 import SidebarHeader from './SidebarHeader';
@@ -57,6 +60,7 @@ import SidebarNavDropdown from './SidebarNavDropdown';
 import SidebarNavLink from './SidebarNavLink';
 import SidebarNavTitle from './SidebarNavTitle';
 import SidebarNavItem from './SidebarNavItem';
+
 export default {
   name: 'sidebar',
   props: {
@@ -77,10 +81,19 @@ export default {
     SidebarNavTitle,
     SidebarNavItem
   },
+  computed: {
+    ...mapGetters(['currentUser'])
+  },
   methods: {
     handleClick(e) {
       e.preventDefault();
       e.target.parentElement.classList.toggle('open');
+    },
+    allowAccess(item) {
+      // allow access if no roles property on nav item or the user's role exist nav item's roles array
+      const allow =
+        isEmpty(item.roles) || item.roles.indexOf(this.currentUser.role) > -1;
+      return allow;
     }
   }
 };
