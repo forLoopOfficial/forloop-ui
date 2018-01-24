@@ -97,7 +97,8 @@ export default {
     {
       name: 'Countries',
       url: '/countries',
-      icon: 'icon-list'
+      icon: 'icon-list',
+      roles: ['superadmin']
     }
   ]
 };
