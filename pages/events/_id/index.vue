@@ -2,7 +2,7 @@
   <div v-if="event">
     <div class="hero__container">
       <!-- Hero -->
-      <section class="hero hero--3">
+      <section class="hero hero--3" ref="background">
         <div class="container">
           <!-- Hero Content -->
           <div class="hero__content">
@@ -25,7 +25,7 @@
               <!-- Hero Event details content content -->
               <div class="hero__event__item__content">
                 <!-- Hero Event date -->
-                <p class="hero__event__item__content__text">{{ Number(event.when.date) | formatDate('dddd MMM d YYYY') }}</p>
+                <p class="hero__event__item__content__text">{{ event.when.date_formatted }}</p>
                 <!-- Hero Event time -->
                 <p class="hero__event__item__content__text">{{ eventTime }}</p>
               </div>
@@ -88,7 +88,7 @@
     </section>
 
     <!-- Sponsors Information -->
-    <section class="info info--2" v-if="event.sponsors">
+    <section class="info info--2" v-if="!isEmpty(event.sponsors)">
       <div class="container">
         <div class="info__title text-center">Sponsor(s)</div>
         <!-- Attendee list -->
@@ -199,6 +199,8 @@
 
 
 <script>
+/* global twttr:true */
+
 import { mapActions, mapGetters } from 'vuex';
 import { isEmpty } from 'lodash';
 
@@ -212,6 +214,13 @@ export default {
   // lifecycle methods
   mounted() {
     this.checkAttendee();
+    if (this.event && this.event.background_image_url) {
+      let src = `url('${this.event.background_image_url}')`;
+      this.$nextTick(() => {
+        this.$refs.background.style.backgroundImage = src;
+        twttr.widgets.load();
+      });
+    }
   },
   data() {
     return {
@@ -238,6 +247,7 @@ export default {
   },
   methods: {
     ...mapActions(['firebaseLogin']),
+    isEmpty,
     attendEvent() {
       // user already exist don't bother with twitter auth again
       if (this.currentUser) {
@@ -276,6 +286,11 @@ export default {
         });
     },
     checkAttendee() {
+      // if user is not logged in, not attending by default
+      if (isEmpty(this.currentUser)) {
+        this.isAttendant = false;
+        return;
+      }
       // check if the user is already attending
       const attending = this.event.attendees.find(
         attendee => attendee._id === this.currentUser._id
