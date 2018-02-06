@@ -35,10 +35,10 @@ const createStore = () =>
           credentials
         );
         const data = response.data;
-        console.log('data', data);
         setToken(data.token);
         this.$axios.setToken(data.token, 'Bearer');
         commit('login_success', data.user);
+        this.$raven.setUserContext(data.user);
         return data;
       },
       async adminLogin({ commit }, credentials) {
@@ -50,6 +50,7 @@ const createStore = () =>
         setToken(data.token);
         this.$axios.setToken(data.token, 'Bearer');
         commit('login_success', data.user);
+        this.$raven.setUserContext(data.user);
         return data;
       },
       async firebaseLogin({ commit, dispatch }) {

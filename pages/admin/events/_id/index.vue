@@ -11,6 +11,8 @@
       <b-col sm="12">
         <b-card :header="caption">
           <b-form @submit.prevent="save">
+            <router-link :to="eventUrl" target="_blank">Event Url</router-link>
+            </b-form-group>
             <b-form-group id="titleGroup1"
                           label="Title:"
                           description="Event's Title">
@@ -334,6 +336,9 @@ export default {
           Number(this.event.when.date)
         ).format('dddd MMM D YYYY');
       }
+    },
+    eventUrl() {
+      return `/events/${this.event.url_slug}`;
     },
     countryOptions() {
       return this.countries.map(country => ({
