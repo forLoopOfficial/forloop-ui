@@ -256,7 +256,7 @@ export default {
             this.event = event;
             this.$toast.success('Succesfully reserved');
           })
-          .catch(function(error) {
+          .catch(error => {
             console.log(error);
             this.$toast.error(`${error.message}`);
           });
