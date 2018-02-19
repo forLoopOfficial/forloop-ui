@@ -269,7 +269,7 @@ export default {
           this.event = event;
           this.$toast.success('Succesfully reserved');
         })
-        .catch(function(error) {
+        .catch(error => {
           console.log(error);
           this.$toast.error(`${error.message}`);
         });
@@ -278,6 +278,7 @@ export default {
       return this.$axios
         .$post(`/events/${this.event._id}/attend`)
         .then(res => {
+          this.isAttendant = true;
           return res.data;
         })
         .catch(e => {

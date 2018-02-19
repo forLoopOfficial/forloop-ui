@@ -59,6 +59,12 @@ const createStore = () =>
         return firebase
           .auth()
           .signInWithPopup(provider)
+          .catch(e => {
+            if (e.code === 'auth/network-request-failed') {
+              throw new Error('Network Error, Please try again');
+            }
+            throw e;
+          })
           .then(result => {
             const user = result.user;
             return user.getIdToken();
