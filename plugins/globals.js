@@ -1,7 +1,9 @@
 import Vue from 'vue';
+import Avatar from 'vue-avatar';
 import AddSubscriber from '~/components/site/AddSubscriber.vue';
 
 Vue.component('AddSubscriber', AddSubscriber);
+Vue.component('Avatar', Avatar);
 
 /* eslint-disable */
 // Include bootstrap JS only

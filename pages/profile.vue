@@ -106,8 +106,8 @@ export default {
       this.$axios
         .$put('/members/profile', changes)
         .then(response => {
-          console.log('response', response);
           this.user = response.data;
+          this.$toast.success('Profile updated successfully');
         })
         .catch(e => {
           alert('Unable to update profile');

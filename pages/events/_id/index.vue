@@ -183,7 +183,9 @@
         <div class="info__list">
           <!-- Attendee list -->
           <div v-for="(attendee, index) in event.attendees" :key="index" class="info__list__item">
-            <img :src="attendee.profile_image" alt="" class="img-circle img-block" height="90" width="90">
+            <!-- <img :src="attendee.profile_image" alt="" class="img-circle img-block" height="90" width="90"> -->
+            <avatar :username="attendee.name" :src="attendee.profile_image" :size="90"></avatar>
+            <div>{{attendee.name}}</div>
           </div>
         </div>
 
@@ -328,5 +330,12 @@ export default {
 <style>
 .info__list {
   justify-content: center;
+}
+
+.info__list__item {
+  text-align: center;
+}
+.vue-avatar--wrapper {
+  margin: 0 auto;
 }
 </style>
