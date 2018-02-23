@@ -77,6 +77,10 @@ const createStore = () =>
         unsetToken();
         this.$axios.setToken(false);
         commit('logout');
+      },
+      setToken({ commit }) {
+        const token = window.localStorage.token;
+        this.$axios.setToken(token, 'Bearer');
       }
     }
   });

@@ -6,7 +6,7 @@ export default function({ app, isServer, store, req }) {
   const loggedUser = isServer
     ? getUserFromCookie(req)
     : getUserFromLocalStorage();
-  if (loggedUser && loggedUser.user) {
+  if (isServer && loggedUser && loggedUser.user) {
     store.commit('login_success', loggedUser.user);
     app.$axios.setToken(loggedUser.token, 'Bearer');
   }

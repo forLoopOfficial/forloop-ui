@@ -33,6 +33,9 @@ export default {
     AppFooter,
     Breadcrumb
   },
+  beforeMount() {
+    this.$store.dispatch('setToken');
+  },
   head() {
     return {
       metaInfo: {

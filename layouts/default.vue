@@ -13,10 +13,12 @@ import AppFooter from '~/components/site/AppFooter.vue';
 
 export default {
   name: 'App',
-
   components: {
     AppBar,
     AppFooter
+  },
+  beforeMount() {
+    this.$store.dispatch('setToken');
   }
 };
 </script>
