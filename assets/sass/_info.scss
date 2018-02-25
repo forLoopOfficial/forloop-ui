@@ -261,6 +261,9 @@
     display: flex;
     flex: 1 1 auto;
     padding: 20px 35px;
+    @include media(max-width 567px) {
+      padding: 1px 5px;
+    }
 }
 
 

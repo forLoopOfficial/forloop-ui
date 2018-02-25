@@ -139,8 +139,8 @@
           <div class="container">
               <h5 class="sponsors__title">Our Sponsors</h5>
               <div class="sponsors__list">
-                  <div class="sponsors__list__row sponsors__list__row--1">
-                      <div v-for="(sponsor, index) in sponsors" :key="index" class="sponsors__list__item">
+                  <div v-for="row in rows" :key="row" class="sponsors__list__row sponsors__list__row--1">
+                      <div v-for="(sponsor, index) in getRowData(row)" :key="index" class="sponsors__list__item">
                           <a :href="sponsor.link" class="sponsors__list__link sponsors__list__link--capture" target="_blank">
                               <img :src="sponsor.image_url" alt="" class="sponsors-image__responsive">
                           </a>
@@ -157,23 +157,33 @@ export default {
   name: 'HomePage',
   data() {
     return {
-      sponsors: []
+      sponsorsPerRow: 5,
+      sponsors: [],
+      rows: 0
     };
   },
   asyncData({ app }) {
     return app.$axios
       .$get(`/sponsors`)
       .then(res => {
-        return { sponsors: res.data };
+        const rows = Math.ceil(res.data.length / 5); // allow only five items per row
+        return { sponsors: res.data, rows };
       })
       .catch(e => {
         console.log('error', e.config);
         return {};
       });
+  },
+  methods: {
+    getRowData(row) {
+      const start = (row - 1) * this.sponsorsPerRow;
+      const end = start + this.sponsorsPerRow;
+      console.log(start, end);
+      return this.sponsors.slice(start, end);
+    }
   }
 };
 </script>
 
 <style>
-
 </style>
