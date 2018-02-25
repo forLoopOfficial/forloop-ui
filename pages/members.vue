@@ -21,6 +21,7 @@
                           </div>
                       </div>
                   </form>
+                  <object class="algolia-text" data="/img/search-by-algolia.svg" type="image/svg+xml"></object>
               </div>
           </div>
       </section>
@@ -198,5 +199,8 @@ export default {
 </script>
 
 <style>
-
+.algolia-text{
+  height: 40px;
+  width: 90px;
+}
 </style>

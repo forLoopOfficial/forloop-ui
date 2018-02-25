@@ -7,7 +7,8 @@ const createStore = () =>
   new Vuex.Store({
     state: {
       authenticated: false,
-      currentUser: null
+      currentUser: null,
+      token: null
     },
     mutations: {
       login_success(state, user) {
@@ -17,6 +18,9 @@ const createStore = () =>
       logout(state) {
         state.authenticated = false;
         state.currentUser = null;
+      },
+      set_token(state, token) {
+        state.token = token;
       }
     },
     getters: {
@@ -38,6 +42,7 @@ const createStore = () =>
         setToken(data.token);
         this.$axios.setToken(data.token, 'Bearer');
         commit('login_success', data.user);
+        commit('set_token', data.token);
         this.$raven.setUserContext(data.user);
         return data;
       },
@@ -78,8 +83,8 @@ const createStore = () =>
         this.$axios.setToken(false);
         commit('logout');
       },
-      setToken({ commit }) {
-        const token = window.localStorage.token;
+      setToken({ commit, state }) {
+        const token = state.token;
         this.$axios.setToken(token, 'Bearer');
       }
     }
