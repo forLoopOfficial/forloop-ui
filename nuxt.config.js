@@ -1,5 +1,6 @@
 require('dotenv').config();
 const webpack = require('webpack');
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
 module.exports = {
   env: {
@@ -25,24 +26,16 @@ module.exports = {
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: 'forLoop Africa' }
     ],
-    link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      {
-        rel: 'stylesheet',
-        type: 'text/css',
-        href:
-          'https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css'
-      }
-    ],
+    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
     script: [
       {
+        async: true,
         src:
           'https://maps.googleapis.com/maps/api/js?key=AIzaSyAcjFtRHmXguek060FhPql3KH_--AXoEjs'
       },
-      { src: 'https://platform.twitter.com/widgets.js' }
+      { async: true, src: 'https://platform.twitter.com/widgets.js' }
     ]
   },
-  // css: ['@/assets/sass/app.scss'],
   /*
   ** Customize the progress bar color
   */
@@ -69,12 +62,15 @@ module.exports = {
     },
     vendor: [
       'axios',
+      'bootstrap-vue',
       'firebase/app',
       'firebase/auth',
       'firebase/storage',
-      'algoliasearch',
+      'flickity',
       'jquery',
-      'lodash'
+      'lodash',
+      'moment',
+      'raven-js'
     ],
     plugins: [
       // set shortcuts as global for bootstrap
@@ -82,7 +78,8 @@ module.exports = {
         $: 'jquery',
         jQuery: 'jquery',
         'window.jQuery': 'jquery'
-      })
+      }),
+      new MomentLocalesPlugin()
     ]
   },
   plugins: [
@@ -95,7 +92,7 @@ module.exports = {
     '@nuxtjs/toast',
     '@nuxtjs/sentry',
     '@nuxtjs/google-analytics',
-    'bootstrap-vue/nuxt'
+    ['bootstrap-vue/nuxt', { css: false }]
   ],
   axios: {
     baseURL: process.env.API_URL,
