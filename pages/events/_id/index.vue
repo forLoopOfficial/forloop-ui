@@ -196,6 +196,34 @@
     </section>
 
     <g-map :location="event.location"></g-map>
+    <!-- Modal content -->
+    <b-modal :closeOnBackdrop='false' id="confirmModal" ref="confirmModal">
+      <div slot="modal-header">
+        <h4 class="modal-title" id="myModalLabel" style="text-align:center">Confirm Attendance</h4>
+      </div>
+      <div slot="modal-body">
+        <transition name="custom-leave" leave-active-class="animated bounceOutRight">
+          <form v-if="!isAttendant" @submit.prevent="confirmAttendance" class="form-horizontal form-label-left">
+            <div class="form-group">
+              <label class="control-label col-md-3 col-sm-3 col-xs-12">Email</label>
+              <div class="col-md-9 col-sm-9 col-xs-12">
+                <input v-model="email" type="text" class="form-control" placeholder="Email" required>
+              </div>
+            </div>
+          </form>
+        </transition>
+        <transition name="custom-enter" enter-active-class="animated tada">
+          <div v-if="isAttendant" class="jumbotron__action jumbotron__action--maxsize" style="text-align:center">
+            <h2>Successfully registered for event</h2>
+          </div>
+        </transition>
+      </div>
+      <div slot="modal-footer">
+        <button v-if="!isAttendant" @click="confirmAttendance" type="button" class="btn btn-primary">Save</button>
+        <button v-if="isAttendant" @click="close" type="button" class="btn btn-primary">Dismiss</button>
+      </div>
+    </b-modal>
+    <!-- Modal content -->
   </div>
 </template>
 
@@ -220,7 +248,9 @@ export default {
       let src = `url('${this.event.background_image_url}')`;
       this.$nextTick(() => {
         this.$refs.background.style.backgroundImage = src;
-        twttr.widgets.load();
+        if (twttr) {
+          twttr.widgets.load();
+        }
       });
     }
   },
@@ -251,12 +281,15 @@ export default {
     ...mapActions(['firebaseLogin']),
     isEmpty,
     attendEvent() {
+      this.$refs.confirmModal.show();
+      return;
+      /* eslint-disable */
       // user already exist don't bother with twitter auth again
-      if (this.currentUser) {
+      if (this.currentUser && !this.currentUser.role) {
         return this.reserve()
           .then(event => {
             this.event = event;
-            this.$toast.success('Succesfully reserved');
+            this.$refs.confirmModal.show();
           })
           .catch(error => {
             console.log(error);
@@ -269,7 +302,8 @@ export default {
         })
         .then(event => {
           this.event = event;
-          this.$toast.success('Succesfully reserved');
+          this.$refs.confirmModal.show();
+          // this.$toast.success('Succesfully reserved');
         })
         .catch(error => {
           console.log(error);
@@ -280,7 +314,6 @@ export default {
       return this.$axios
         .$post(`/events/${this.event._id}/attend`)
         .then(res => {
-          this.isAttendant = true;
           return res.data;
         })
         .catch(e => {
@@ -299,6 +332,21 @@ export default {
         attendee => attendee._id === this.currentUser._id
       );
       this.isAttendant = !isEmpty(attending);
+    },
+    confirmAttendance() {
+      const body = {
+        email: this.eamil
+      };
+      let url = `/miscs/subscribe`;
+      this.$axios
+        .$post(url, body)
+        .then(res => {
+          console.log(res);
+          this.isAttendant = true;
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   },
 

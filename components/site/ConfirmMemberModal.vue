@@ -69,9 +69,7 @@
 
 
 <script>
-import firebase from 'firebase';
 
-const membersRef = firebase.database().ref('members_page/members');
 export default {
   name: 'ConfirmMember',
 
@@ -106,24 +104,24 @@ export default {
         this.user.twitter_link,
         'twitter.com'
       );
-      membersRef
-        .child(this.user.uid)
-        .set(this.user)
-        .then(() => {
-          if (this.user.email) {
-            let formData = new FormData();
-            formData.append('email', this.user.email);
-            let url = `/api/subscribe`;
-            this.$http
-              .post(url, formData)
-              .then(res => {
-                console.log(res);
-              })
-              .catch(err => {
-                console.log(err);
-              });
-          }
-        });
+      // membersRef
+      //   .child(this.user.uid)
+      //   .set(this.user)
+      //   .then(() => {
+      //     if (this.user.email) {
+      //       let formData = new FormData();
+      //       formData.append('email', this.user.email);
+      //       let url = `/api/subscribe`;
+      //       this.$http
+      //         .post(url, formData)
+      //         .then(res => {
+      //           console.log(res);
+      //         })
+      //         .catch(err => {
+      //           console.log(err);
+      //         });
+      //     }
+      //   });
       this.close();
     },
     close() {

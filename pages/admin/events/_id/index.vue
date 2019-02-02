@@ -212,6 +212,7 @@ export default {
         })
         .catch(error => {
           this.updating = false;
+          console.log(error.response.data);
           this.$toast.error(error.message);
         });
     },

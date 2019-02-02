@@ -60,6 +60,11 @@
                         <span class="link-text">Login</span>
                     </a>
                 </div>
+                <div v-if="currentUser"  class="sidebar-nav__item">
+                  <a to="#" class="navbar__item__link" @click="logout">
+                    <span class="link-text">Logout</span>
+                  </a>
+              </div>
             </div>
             <div class="navbar__right navbar__right--hide">
                 <!-- Nav ITEM -->
@@ -130,6 +135,11 @@
                       <span class="link-text">Login</span>
                   </a>
               </div>
+              <div v-if="currentUser" @click="logout" class="sidebar-nav__item">
+                  <nuxt-link to="#" class="navbar__item__link">
+                      <span class="link-text">Logout</span>
+                  </nuxt-link>
+              </div>
               <!-- Nav ITEM -->
               <div class="sidebar-nav__item">
                   <div class="navbar__item__link">
@@ -159,7 +169,7 @@ import { mapActions, mapGetters } from 'vuex';
 export default {
   name: 'AppBar',
   methods: {
-    ...mapActions(['firebaseLogin']),
+    ...mapActions(['firebaseLogin', 'logout']),
     openSidebar() {
       this.$refs.open.classList.add('hide');
       this.$refs.sidebar.classList.add('active');
