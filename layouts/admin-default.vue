@@ -1,17 +1,17 @@
 <template>
-    <div class="app">
-      <AppHeader/>
-      <div class="app-body">
-        <Sidebar :navItems="nav"/>
-        <main class="main">
-          <breadcrumb :list="list"/>
-          <div class="container-fluid">
-            <nuxt/>
-          </div>
-        </main>
-      </div>
-      <AppFooter/>
+  <div class="app">
+    <AppHeader/>
+    <div class="app-body">
+      <Sidebar :navItems="nav"/>
+      <main class="main">
+        <breadcrumb :list="list"/>
+        <div class="container-fluid">
+          <nuxt/>
+        </div>
+      </main>
     </div>
+    <AppFooter/>
+  </div>
 </template>
 
 <script>
@@ -32,9 +32,6 @@ export default {
     AppAside,
     AppFooter,
     Breadcrumb
-  },
-  beforeMount() {
-    this.$store.dispatch('setToken');
   },
   head() {
     return {
@@ -63,5 +60,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~assets/admin/scss/style.scss';
+@import "~assets/admin/scss/style.scss";
 </style>

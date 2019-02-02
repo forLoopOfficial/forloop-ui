@@ -1,7 +1,10 @@
 import Vuex from 'vuex';
 import firebase from 'firebase/app';
+import jwtDecode from 'jwt-decode';
+import { isEmpty } from 'lodash';
 
 import { setToken, unsetToken } from '~/utils/auth';
+const cookieparser = require('cookieparser');
 
 const createStore = () =>
   new Vuex.Store({
@@ -21,6 +24,7 @@ const createStore = () =>
       },
       set_token(state, token) {
         state.token = token;
+        setToken(token);
       }
     },
     getters: {
@@ -32,17 +36,31 @@ const createStore = () =>
       }
     },
     actions: {
+      nuxtServerInit({ commit }, { req, app }) {
+        let token = '';
+        let user = null;
+        if (req.headers.cookie) {
+          const parsed = cookieparser.parse(req.headers.cookie);
+          token = parsed.jwt;
+        }
+
+        if (!isEmpty(token)) {
+          user = jwtDecode(token);
+        }
+
+        commit('login_success', user);
+        commit('set_token', token);
+        app.$axios.setToken(token, 'Bearer');
+      },
       async login({ commit }, credentials) {
-        console.log(credentials);
         const response = await this.$axios.$post(
           '/auth/member/verify',
           credentials
         );
         const data = response.data;
-        setToken(data.token);
-        this.$axios.setToken(data.token, 'Bearer');
         commit('login_success', data.user);
         commit('set_token', data.token);
+        this.$axios.setToken(data.token, 'Bearer');
         this.$raven.setUserContext(data.user);
         return data;
       },
@@ -52,9 +70,10 @@ const createStore = () =>
           credentials
         );
         const data = response.data;
-        setToken(data.token);
-        this.$axios.setToken(data.token, 'Bearer');
+
         commit('login_success', data.user);
+        commit('set_token', data.token);
+        this.$axios.setToken(data.token, 'Bearer');
         this.$raven.setUserContext(data.user);
         return data;
       },
@@ -79,13 +98,9 @@ const createStore = () =>
           });
       },
       logout({ commit }) {
-        unsetToken();
         this.$axios.setToken(false);
+        unsetToken();
         commit('logout');
-      },
-      setToken({ commit, state }) {
-        const token = state.token;
-        this.$axios.setToken(token, 'Bearer');
       }
     }
   });

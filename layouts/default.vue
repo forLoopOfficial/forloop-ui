@@ -16,9 +16,6 @@ export default {
   components: {
     AppBar,
     AppFooter
-  },
-  beforeMount() {
-    this.$store.dispatch('setToken');
   }
 };
 </script>

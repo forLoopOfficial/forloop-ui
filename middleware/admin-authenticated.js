@@ -1,7 +1,8 @@
 export default function({ app, store, redirect }) {
   // If the admin user is not authenticated
+  const user = store.state.currentUser;
   if (
-    !store.state.authenticated ||
+    !user ||
     (store.state.currentUser.role !== 'superadmin' &&
       store.state.currentUser.role !== 'admin')
   ) {

@@ -11,12 +11,6 @@ module.exports = {
     algoliaSearchKey: process.env.ALGOLIA_SEARCH_KEY
   },
   /*
-  ** Router config
-  */
-  router: {
-    middleware: 'check-auth'
-  },
-  /*
   ** Headers of the page
   */
   head: {
@@ -83,6 +77,7 @@ module.exports = {
     ]
   },
   plugins: [
+    '~plugins/axios.js',
     '~plugins/filters.js',
     { src: '~plugins/firebase.js', ssr: true },
     { src: '~plugins/globals.js', ssr: true }

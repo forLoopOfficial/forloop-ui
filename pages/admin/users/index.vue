@@ -1,5 +1,4 @@
 <template>
-
   <!-- Page content -->
   <div class="animated fadeIn">
     <b-row>
@@ -10,10 +9,21 @@
     <b-row>
       <b-col sm="12">
         <b-card :header="caption">
-          <b-table :hover="true" :striped="true" :bordered="true" :fixed="true" class="table-responsive-sm" :items="users" :fields="fields" :current-page="meta.page" :per-page="meta.perPage">
-            <template slot="full_name" scope="data">
-              {{data.item.first_name}}, {{data.item.last_name}}
-            </template>
+          <b-table
+            :hover="true"
+            :striped="true"
+            :bordered="true"
+            :fixed="true"
+            class="table-responsive-sm"
+            :items="users"
+            :fields="fields"
+            :current-page="meta.page"
+            :per-page="meta.perPage"
+          >
+            <template
+              slot="full_name"
+              scope="data"
+            >{{data.item.first_name}}, {{data.item.last_name}}</template>
             <template slot="active" scope="data">
               <b-badge :variant="getBadge(data.item.active)">{{getStatus(data.item.active)}}</b-badge>
             </template>
@@ -22,7 +32,14 @@
             </template>
           </b-table>
           <nav>
-            <b-pagination :total-rows="getRowCount(users)" :per-page="meta.perPage" v-model="meta.page" prev-text="Prev" next-text="Next" hide-goto-end-buttons/>
+            <b-pagination
+              :total-rows="getRowCount(users)"
+              :per-page="meta.perPage"
+              v-model="meta.page"
+              prev-text="Prev"
+              next-text="Next"
+              hide-goto-end-buttons
+            />
           </nav>
         </b-card>
       </b-col>
@@ -30,7 +47,6 @@
     <add-user :show="show" :closed="closeAddModal" :countries="countries"></add-user>
   </div>
   <!-- /Page content -->
-
 </template>
 
 
