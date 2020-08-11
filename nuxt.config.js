@@ -1,8 +1,14 @@
-require('dotenv').config();
-const webpack = require('webpack');
-const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
+require('dotenv').config()
+const webpack = require('webpack')
+// const MomentLocalesPlugin = require('moment-locales-webpack-plugin')
 
 module.exports = {
+  mode: 'spa',
+  /*
+   ** Nuxt target
+   ** See https://nuxtjs.org/api/configuration-target
+   */
+  target: 'server',
   env: {
     firebaseApiUrl: process.env.FIREBASE_API_URL,
     firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,
@@ -11,8 +17,8 @@ module.exports = {
     algoliaSearchKey: process.env.ALGOLIA_SEARCH_KEY
   },
   /*
-  ** Headers of the page
-  */
+   ** Headers of the page
+   */
   head: {
     title: 'forloop Africa',
     meta: [
@@ -31,49 +37,22 @@ module.exports = {
     ]
   },
   /*
-  ** Customize the progress bar color
-  */
+   ** Customize the progress bar color
+   */
   loading: { color: '#3B8070' },
   render: {
     resourceHints: false
   },
   /*
-  ** Build configuration
-  */
+   ** Build configuration
+   */
   build: {
-    /*
-    ** Run ESLint on save
-    */
-    extend(config, ctx) {
-      if (ctx.dev && ctx.isClient) {
-        config.module.rules.push({
-          enforce: 'pre',
-          test: /\.(js|vue)$/,
-          loader: 'eslint-loader',
-          exclude: /(node_modules)/
-        });
-      }
-    },
-    vendor: [
-      'axios',
-      'bootstrap-vue',
-      'firebase/app',
-      'firebase/auth',
-      'firebase/storage',
-      'flickity',
-      'jquery',
-      'lodash',
-      'moment',
-      'raven-js'
-    ],
     plugins: [
-      // set shortcuts as global for bootstrap
       new webpack.ProvidePlugin({
         $: 'jquery',
         jQuery: 'jquery',
         'window.jQuery': 'jquery'
-      }),
-      new MomentLocalesPlugin()
+      })
     ]
   },
   plugins: [
@@ -97,4 +76,4 @@ module.exports = {
   'google-analytics': {
     id: process.env.GA_TRACKING_ID
   }
-};
+}
