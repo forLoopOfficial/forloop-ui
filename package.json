@@ -56,7 +56,7 @@
     "eslint-plugin-vue": "^6.2.2",
     "moment-locales-webpack-plugin": "^1.0.4",
     "prettier": "^1.8.2",
-    "prettier-eslint": "^8.2.2",
+    "prettier-eslint": "^8.2.2"
   },
   "engines": {
     "node": ">=9.8.0"
